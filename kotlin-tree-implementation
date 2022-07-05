@@ -1,0 +1,51 @@
+import kotlin.math.max
+
+sealed class Tree<A> {
+    abstract fun isEmpty(): Boolean
+    abstract fun size(): Int
+    abstract fun depth(): Int
+    abstract fun <B> map(transform: (A) -> B): Tree<B>
+    
+    open fun add2(value: A, compare: (A, A) -> Int): Tree<A> = when (this) {
+        Empty -> treeNode(value)
+        is Node -> if ((compare(value, this.value)) <= 0) {
+            treeNode(this.value, left.add2(value, compare), this.right)
+        } else {
+            treeNode(this.value, this.left, right.add2(value, compare))
+        }
+    }
+}
+
+private data class Node<A>(
+    val value: A,
+    val left: Tree<A>,
+    val right: Tree<A>
+) : Tree<A>() {
+    override fun isEmpty(): Boolean = false
+
+    override fun size(): Int = left.size() + right.size() + 1
+
+    override fun depth(): Int = max(left.depth(), right.depth()) + 1
+    override fun add2(value: A, compare: (A, A) -> Int): Tree<A> {
+        TODO("Not yet implemented")
+    }
+
+    override fun <B> map(transform: (A) -> B): Tree<B> =
+        treeNode(transform(this.value), left.map(transform), right.map(transform))
+}
+
+private object Empty : Tree<Any>() {
+    override fun isEmpty(): Boolean = true
+    override fun size(): Int = 0
+    override fun depth(): Int = 0
+    override fun add2(value: Any, compare: (Any, Any) -> Int): Tree<Any> = treeNode(value)
+    override fun <B> map(transform: (Any) -> B): Tree<B> = emptyTree()
+}
+
+fun <A> emptyTree(): Tree<A> = Empty as Tree<A>
+
+fun <A> treeNode(
+    value: A,
+    left: Tree<A> = emptyTree(),
+    right: Tree<A> = emptyTree()
+): Tree<A> = Node(value, left, right)

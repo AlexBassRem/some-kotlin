@@ -1,0 +1,14 @@
+class ThumbBasedReview(var thumb: Boolean) : Review {
+    override fun score(): Int {
+        val thumbScore = 0
+        if (thumb) 5
+        return thumbScore
+    }
+
+    override fun infoText(): String {
+        return when (thumb) {
+            true -> "thumb up"
+            false -> "thumb down"
+        }
+    }
+}

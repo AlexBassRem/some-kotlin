@@ -1,0 +1,4 @@
+interface Review {
+    fun score(): Int
+    fun infoText(): String
+}

@@ -1,0 +1,11 @@
+enum class Quality {
+    GOOD,
+    USED,
+    BAD;
+
+    fun qualityNow() = when (this) {
+        BAD -> "Schlechte Qualität"
+        USED -> "Gebrauchte Qualität"
+        GOOD -> "Gute Qualität"
+    }
+}

@@ -1,0 +1,65 @@
+class ShoppingCart {
+    private var cart = mutableListOf<Product>()
+    private fun format(double: Double): String = "%.2f".format(double)
+
+    fun add(product: Product) = cart.add(product)
+
+    private fun totalPrice(): Double {
+        var total = 0.0
+        cart.forEach { Product ->
+            total += Product.salesPrice()
+        }
+        return total
+    }
+
+    fun hasFreeShipping(): Boolean = totalPrice() > 30.0
+
+    fun getProductByName(productName: String) {
+        cart.firstOrNull { Product ->
+            Product.name == productName
+        }
+    }
+
+    fun reviewTextForProduct(productName: String): String {
+        var ergebnisString = ""
+        val firstProduct = cart.find { Product ->
+            productName == Product.name
+        }
+        firstProduct?.reviewList?.forEach { Review ->
+            ergebnisString += Review.infoText() + "\n"
+        }
+        return ergebnisString
+    }
+
+    fun removeProductsBelowReviewScore(score: Int) {
+
+        cart.removeIf { Product ->
+            if (Product.reviewList.size == 0)
+                return@removeIf false
+
+            var avgScore = Product.reviewList.sumOf { review ->
+                review.score()
+            }
+            avgScore /= Product.reviewList.size
+            return@removeIf (score > avgScore)
+        }
+
+    }
+
+    private fun savedMoney(): Double {
+        var savedMoney = 0.0
+        cart.forEach {
+            savedMoney += it.moneySaved()
+        }
+        return savedMoney
+    }
+
+    fun show() {
+        println("Ihr Warenkorb:")
+        println("")
+        println("Gesamtpreis: ${format(totalPrice())} Euro (${format(savedMoney())} Euro gespart!)")
+        cart.forEach {
+            println(it.toString())
+        }
+    }
+}

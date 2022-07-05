@@ -1,0 +1,13 @@
+class LimitedProduct(
+    name: String,
+    basePrice: Double,
+    margin: Double,
+    private val totalNumberOfProducts: Int
+) : Product(name, basePrice, margin) {
+
+    private val priceIncrease = (200.0 - totalNumberOfProducts) / 100.0
+
+    override fun salesPrice(): Double = super.salesPrice() * priceIncrease
+
+    override fun toString(): String = super.toString() + " (nur $totalNumberOfProducts Exemplare verfügbar)"
+}

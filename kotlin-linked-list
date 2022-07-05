@@ -1,0 +1,122 @@
+class LinkedList<T> {
+    data class Node<T>(val data: T, var next: Node<T>?)
+
+    private var first: Node<T>? = null
+
+    private fun isEmpty(): Boolean = first == null
+
+    fun addFirst(obj: T) {
+        first = Node(obj, first)
+    }
+
+    fun getFirst(): T = if (first != null) first!!.data else throw java.util.NoSuchElementException()
+
+    fun getLast(): T {
+        if (isEmpty()) throw NoSuchFieldException()
+
+        var runPointer = first
+        while (runPointer?.next != null) {
+            runPointer = runPointer.next
+        }
+        return runPointer!!.data
+    }
+
+    fun size(): Int {
+        var runPointer = first
+        var count = 0
+
+        while (runPointer != null) {
+            count++
+            runPointer = runPointer.next
+        }
+        return count
+    }
+
+    fun get(index: Int): T {
+        var runPointer = first
+        var position = 0
+
+        while (runPointer != null && position < index) {
+            position++
+            runPointer = runPointer.next
+        }
+        //Der runPointer kann null sein, wenn die Liste leer ist, der index negativ oder zu groß ist.
+        if (runPointer == null) {
+            throw java.util.NoSuchElementException()
+        } else {
+            return runPointer.data
+        }
+    }
+
+    fun getOrNull(index: Int): T? {
+        var runPointer = first
+        var position = 0
+
+        while (runPointer != null && position < index) {
+            position++
+            runPointer = runPointer.next
+        }
+        //Der runPointer kann null sein, wenn die Liste leer ist, der index negativ oder zu groß ist.
+        return runPointer?.data
+    }
+
+    fun addLast(obj: T) {
+        if (isEmpty()) {
+            addFirst(obj)
+        } else {
+            var runPointer = first
+            while (runPointer?.next != null) {
+                runPointer = runPointer.next
+            }
+            runPointer?.next = Node(obj, null)
+        }
+    }
+
+    fun contains(obj: T): Boolean {
+        var runPointer = first
+        while (runPointer != null) {
+            if (runPointer.data == obj) return true
+
+            runPointer = runPointer.next
+        }
+        return false
+    }
+
+    fun remove(obj: T) {
+        if (first?.data == obj) {
+            first = first?.next
+        } else {
+            var runPointer = first
+            while (runPointer?.next?.data != obj) {
+                runPointer = runPointer?.next
+            }
+            runPointer?.next = runPointer?.next?.next
+        }
+    }
+
+    fun clear() {
+        first = null
+    }
+
+    fun forEach(f: (T) -> Unit) {
+        var runPointer = first
+        while (runPointer != null) {
+            f(runPointer.data)
+            runPointer = runPointer.next
+        }
+    }
+
+    fun size2(): Int {
+        var count = 0
+
+        forEach { count++ }
+
+        return count
+    }
+
+    fun countWhere(condition: (T) -> Boolean): Int {
+        var count = 0
+        forEach { if (condition(it)) count++ }
+        return count
+    }
+}

@@ -1,0 +1,228 @@
+class Time(var hour_param: Int, var minute_param: Int) {
+    init {
+        if (hour_param > 24 || hour_param <= -1 || minute_param > 60 || minute_param < 0) {
+            throw Exception("invalide Uhrzeit!")
+        }
+    }
+
+    override fun toString(): String {
+        return if (minute_param <= 9) {
+            "$hour_param : 0$minute_param"
+        } else {
+            "$hour_param : $minute_param"
+        }
+    }
+}
+
+class ParkTicket(private var entryTime: Time) {
+
+    var exitTime: Time? = null
+        private set
+
+    //Zeit, die geparkt wurde
+    val getParkingDuration: Int
+        get() = getDuration()
+
+    //Angefangene Stunden
+    val getHoursStarted: Int
+        get() = ((getDuration() -1 )/ 60) + 1
+
+    //Hilfsfunktion zur Berechnung von getParkingDuration und getHoursStarted
+    private fun getDuration (): Int {
+        val entryMinutes: Int
+        val exitMinutes: Int
+        val getParam: Int
+
+        if (exitTime == null) {
+            throw Exception("ParkTicket muss vorher korrekt abgestempelt werden")
+        } else {
+            entryMinutes = (entryTime.hour_param * 60) + (entryTime.minute_param)
+            exitMinutes = (exitTime!!.hour_param * 60) + (exitTime!!.minute_param)
+            getParam = exitMinutes - entryMinutes
+        }
+        return getParam
+    }
+
+    override fun toString(): String = "Ankuftszeit: $entryTime Ausfahrtzeit: $exitTime "
+
+    //Abstempeln des Parktickets
+    fun checkout(exitTime: Time) {
+        if (exitTime.hour_param > entryTime.hour_param) {
+            this.exitTime = exitTime
+        } else if (exitTime.hour_param == entryTime.hour_param && exitTime.minute_param > entryTime.minute_param) {
+            this.exitTime = exitTime
+        } else throw Exception("Ausfahrtszeit $exitTime liegt vor der Einfahrtszeit $entryTime")
+    }
+
+//    fun parkingDuration(): Int {
+//        val duration : Int
+//        val entryMinutes : Int
+//        val exitMinutes: Int
+//
+//        if (exitTime != null) {
+//            entryMinutes = (entryTime.hour_param * 60) + (entryTime.minute_param)
+//            exitMinutes = (exitTime!!.hour_param * 60) + (exitTime!!.minute_param)
+//            duration = exitMinutes - entryMinutes
+//        } else {
+//            throw Exception("ParkTicket muss vorher korrekt abgestempelt werden")
+//        }
+//        return duration
+//    }
+//
+//    fun hoursStarted(): Int {
+//        val entryMinutes: Int
+//        val exitMinutes: Int
+//        val hoursParked : Int
+//
+//        if (exitTime == null) {
+//            throw Exception("ParkTicket muss vorher korrekt abgestempelt werden")
+//        } else {
+//            entryMinutes = (entryTime.hour_param * 60) + (entryTime.minute_param)
+//            exitMinutes = (exitTime!!.hour_param * 60) + (exitTime!!.minute_param)
+//            hoursParked = ((exitMinutes - entryMinutes - 1) / 60) + 1
+//        }
+//        return hoursParked
+//    }
+}
+
+enum class Tariff {
+    DEFAULT,
+    EVENT,
+    WEEKEND;
+
+    fun price() = when (this) {
+        EVENT -> 1.49
+        DEFAULT -> 1.99
+        WEEKEND -> 2.99
+    }
+}
+
+class TicketMachine(private var tarif: Tariff) {
+    private val tickets = mutableListOf<ParkTicket>()
+
+    //Generieren eines neuen Partickets mit entryTime als Parameter
+    fun generate(entryTime: Time): ParkTicket {
+        val ticket1 = ParkTicket(entryTime)
+        tickets.add(ticket1)
+        return ticket1
+    }
+
+    //Hinzufügen eines abgestempelten Parktickets in eine MutableList
+    private fun validTickets(): List<ParkTicket> {
+        val validTickets = mutableListOf<ParkTicket>()
+        // for (it in tickets) {}
+        // Google: "kotlin forEach access element"
+        tickets.forEach { parkTicket ->
+            if (parkTicket.exitTime != null) {
+                validTickets.add(parkTicket)
+            }
+        }
+        return validTickets
+    }
+
+    //Suche nach der kürzesten Parkzeit
+    fun shortestParkingDuration(): Int {
+        val allTickets = validTickets()
+        var shortestParkingDuration = allTickets[0].getParkingDuration
+        allTickets.forEach { parkTicket ->
+            if (parkTicket.getParkingDuration < shortestParkingDuration) {
+                shortestParkingDuration = parkTicket.getParkingDuration
+            }
+        }
+        return shortestParkingDuration
+
+        /*
+        // 1
+        var shorty1 = allTickets[0].parkingDuration()
+        // 2
+        var shorty2: Int? = null
+        // 3
+        var shorty3 = Int.MAX_VALUE
+        */
+    }
+
+    //Durchschnittliche Parkdauer berechnen
+    fun averageParkingDuration(): Int {
+        val allTickets = validTickets()
+        var sumDuration = 0
+        var count = 0
+
+        allTickets.forEach { parkTicket ->
+            count++
+            sumDuration += parkTicket.getParkingDuration
+        }
+        return sumDuration / count
+    }
+
+    //Funktion zur Berechnung der Gesamtumsätze der validen Parktickets
+    fun revenues(): Double {
+        val allTickets = validTickets()
+        var revenue = 0.0
+
+        allTickets.forEach { parkTicket ->
+            revenue += parkTicket.getHoursStarted.toDouble() * tarif.price()
+        }
+        return revenue
+    }
+}
+
+
+fun main() {
+//    val time1 = Time(12, 0 )
+//    println( time1.toString())
+//    val time2 = Time(12, 30)
+//    println( time2.toString())
+//    val time3 = Time(26,120)
+//    println( time3.toString())
+//    val time4 = Time(-5, -10)
+//    println( time4.toString())
+//    val entryTime1  = Time(12,0)
+//    val exitTime = Time (12,30)
+//    val ticket11 = ParkTicket(entryTime1)
+//    println( ticket11.toString())
+//    ticket11.checkout(Time(12,30))
+//    println( ticket11.toString())
+//    ticket11.checkout(Time(11,0))
+//    println( ticket11.toString())
+
+    val entryTime = Time(12, 0)
+    val ticket = ParkTicket(entryTime)
+    ticket.checkout(Time(12, 30)) // funktioniert , weil 12:00 < 12:30 println ( ticket . parkingDuration ()) // Gibt 30 aus
+    println(ticket.getParkingDuration)
+    println(ticket.getHoursStarted) // Gibt 1 aus
+    val ticket21 = ParkTicket(Time(12, 30))
+    ticket21.checkout(Time(13, 40)) // funktioniert , weil 12:30 < 13:40 println ( ticket2 . parkingDuration ()) // Gibt 70 aus
+    println(ticket21.getParkingDuration)
+    println(ticket21.getHoursStarted) // Gibt 2 aus
+    val default = Tariff.DEFAULT
+    println(default.price()) // Gibt 1.99 aus
+    val weekend = Tariff.WEEKEND
+    println(weekend.price()) // Gibt 2.99 aus.
+
+
+    val machine1 = TicketMachine(Tariff.DEFAULT) // 1.99
+    val ticket1 = machine1.generate(Time(12, 0))
+    val ticket2 = machine1.generate(Time(12, 30))
+    val ticket3 = machine1.generate(Time(13, 30))
+    val ticket4 = machine1.generate(Time(13, 30))
+
+    ticket1.checkout(Time(12, 30)) // 30 min (1h)
+    ticket2.checkout(Time(13, 30)) // 60 min (1h)
+    ticket3.checkout(Time(14, 50)) // 80 min (2h)
+    // ticket4 wird nicht abgestempelt
+
+    println(machine1.shortestParkingDuration()) // Gibt 30 aus
+    println(machine1.averageParkingDuration()) // Gibt 56 aus (30 + 60 + 80) / 3
+    println(machine1.revenues()) // Gibt 7.96 aus (1 + 1 + 2) * 1.99
+
+
+    val machine = TicketMachine(Tariff.DEFAULT)
+    val ticket5 = machine.generate(Time(12, 0))
+    //ticket5 . exitTime = Time(10 , 0) // exitTime direkt setzen , ohne checkout aufzurufen
+    ticket5.checkout(Time(12, 30))
+    println(ticket5.getParkingDuration) //Gibt 30 aus !
+
+
+
+    println("Programmende")
+}

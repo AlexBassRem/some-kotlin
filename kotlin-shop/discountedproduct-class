@@ -1,0 +1,13 @@
+class DiscountedProduct(
+    name: String,
+    basePrice: Double,
+    margin: Double,
+    private val discount: Double
+) : Product(name, basePrice, margin) {
+
+    override fun salesPrice(): Double = super.salesPrice() * discount
+
+    override fun moneySaved(): Double = (super.salesPrice()) - (salesPrice())
+
+    override fun toString(): String = super.toString() + " (${format(moneySaved())} Euro gespart!)"
+}

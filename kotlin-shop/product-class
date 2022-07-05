@@ -1,0 +1,20 @@
+open class Product(
+    val name: String,
+    val basePrice: Double,
+    val margin: Double
+) {
+
+    open fun salesPrice(): Double = basePrice * margin
+
+    open fun moneySaved(): Double = 0.0
+
+    fun format(double: Double): String = "%.2f".format(double)
+
+    override fun toString(): String = ("$name für ${format(salesPrice())} Euro")
+
+    val reviewList = mutableListOf<Review>()
+
+    fun addReview(review: Review) {
+        reviewList.add(review)
+    }
+}

@@ -1,0 +1,19 @@
+class StarReview(var score: Int) : Review {
+
+    override fun score(): Int {
+        if (score < 0) score = 0
+        if (score > 5) score = 5
+        return score
+    }
+
+    override fun infoText(): String {
+        if (score <= 0) return "Schlechtes Produkt"
+        if (score == 1) return "Schlimmes Produkt"
+        if (score == 2) return "Halbwegs brauchbares Produkt"
+        if (score == 3) return "Brauchbares Produkt"
+        if (score == 4) return "Nettes Produkt"
+        return if (score >= 5) "Super Produkt"
+        else
+            "Something"
+    }
+}
